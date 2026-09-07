@@ -11,13 +11,19 @@ import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessage, ThinkingBubble } from "@/components/chat/chat-message";
 import { EmptyState } from "@/components/chat/empty-state";
 import { TopNav } from "@/components/chat/top-nav";
+import {
+  buildSourceFiles,
+  type Attachment,
+  type ChatUIMessage,
+} from "@/lib/attachments";
 
 export function ChatPanel() {
   const { messages, sendMessage, status, error, stop, setMessages, regenerate } =
-    useChat({
+    useChat<ChatUIMessage>({
       transport: new DefaultChatTransport({ api: "/api/chat" }),
     });
 
+  const [attachments, setAttachments] = React.useState<Attachment[]>([]);
   const isBusy = status === "submitted" || status === "streaming";
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -30,14 +36,27 @@ export function ChatPanel() {
 
   const send = React.useCallback(
     (text: string) => {
-      void sendMessage({ text });
+      // 자료 상한을 여기서 한 번만 적용합니다. 그 결과가 메시지에 그대로 남으므로
+      // 화면에서 펼쳐 보는 내용과 모델에 전달된 내용이 항상 일치합니다.
+      const files = buildSourceFiles(attachments);
+      void sendMessage({
+        parts:
+          files.length > 0
+            ? [{ type: "data-sources", data: { files } }, { type: "text", text }]
+            : [{ type: "text", text }],
+      });
     },
-    [sendMessage],
+    [attachments, sendMessage],
   );
+
+  function reset() {
+    setMessages([]);
+    setAttachments([]);
+  }
 
   return (
     <div className="flex h-dvh flex-col bg-canvas">
-      <TopNav onReset={() => setMessages([])} />
+      <TopNav onReset={reset} />
 
       <div
         ref={scrollRef}
@@ -60,7 +79,10 @@ export function ChatPanel() {
           {status === "submitted" && <ThinkingBubble />}
 
           {error && (
-            <Card role="alert" className="flex items-start gap-md border-critical-strong">
+            <Card
+              role="alert"
+              className="flex items-start gap-md border-critical-strong"
+            >
               <AlertTriangle
                 size={20}
                 className="mt-xxs shrink-0 text-critical-strong"
@@ -86,7 +108,18 @@ export function ChatPanel() {
 
       <div className="border-t border-hairline-soft bg-canvas">
         <div className="mx-auto w-full max-w-[820px] px-xl py-base md:px-xxl">
-          <ChatComposer onSubmit={send} onStop={stop} isBusy={isBusy} />
+          <ChatComposer
+            attachments={attachments}
+            onAttach={(files) =>
+              setAttachments((prev) => [...prev, ...files])
+            }
+            onRemoveAttachment={(id) =>
+              setAttachments((prev) => prev.filter((item) => item.id !== id))
+            }
+            onSubmit={send}
+            onStop={stop}
+            isBusy={isBusy}
+          />
           <p className="mt-xs text-caption text-stone">
             AI가 생성한 답변은 부정확할 수 있습니다.
           </p>

@@ -1,16 +1,15 @@
-import type { UIMessage } from "ai";
-
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SourceDetails } from "@/components/chat/source-details";
+import type { ChatUIMessage, SourceFile } from "@/lib/attachments";
 import { cn } from "@/lib/utils";
 
 /**
  * 메시지 버블은 DESIGN.md의 카드 규칙에서 파생했습니다.
- * - 어시스턴트: card-product-feature 계열(canvas + hairline-soft 1px, 그림자 없음)
+ * - 어시스턴트: canvas + hairline-soft 1px, 그림자 없음
  * - 사용자: card-promo-strip 계열(ink-deep 배경 + canvas 텍스트)
- * - 라운딩은 {rounded.xxl}(24px) — 고스트 액션 카드 값. 버튼이 아니므로 pill을 쓰지 않습니다.
- * - 본문은 {typography.body-md}: 16px / 1.50 / -0.16px (line-height는 1.50 미만 금지)
+ * - 라운딩은 {rounded.xxl}(24px), 본문은 {typography.body-md} (line-height 1.50 유지)
  */
-export function ChatMessage({ message }: { message: UIMessage }) {
+export function ChatMessage({ message }: { message: ChatUIMessage }) {
   const isUser = message.role === "user";
 
   const text = message.parts
@@ -18,7 +17,11 @@ export function ChatMessage({ message }: { message: UIMessage }) {
     .map((part) => (part as { text: string }).text)
     .join("");
 
-  if (!text) return null;
+  const sources: SourceFile[] = message.parts.flatMap((part) =>
+    part.type === "data-sources" ? part.data.files : [],
+  );
+
+  if (!text && sources.length === 0) return null;
 
   return (
     <div
@@ -35,13 +38,24 @@ export function ChatMessage({ message }: { message: UIMessage }) {
 
       <div
         className={cn(
-          "max-w-[min(680px,82%)] rounded-xxl px-xl py-base text-body-md whitespace-pre-wrap break-words",
-          isUser
-            ? "bg-ink-deep text-canvas"
-            : "border border-hairline-soft bg-canvas text-ink",
+          "flex max-w-[min(680px,82%)] flex-col gap-xs",
+          isUser ? "items-end" : "items-start",
         )}
       >
-        {text}
+        {text && (
+          <div
+            className={cn(
+              "rounded-xxl px-xl py-base text-body-md whitespace-pre-wrap break-words",
+              isUser
+                ? "bg-ink-deep text-canvas"
+                : "border border-hairline-soft bg-canvas text-ink",
+            )}
+          >
+            {text}
+          </div>
+        )}
+
+        {sources.length > 0 && <SourceDetails files={sources} />}
       </div>
 
       {isUser && (
@@ -77,7 +91,10 @@ function Dot({ delay }: { delay: string }) {
   return (
     <span
       className="size-[6px] rounded-full bg-stone"
-      style={{ animation: "caret-blink 1.2s ease-in-out infinite", animationDelay: delay }}
+      style={{
+        animation: "caret-blink 1.2s ease-in-out infinite",
+        animationDelay: delay,
+      }}
     />
   );
 }

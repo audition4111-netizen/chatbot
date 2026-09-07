@@ -1,6 +1,12 @@
-import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { convertToModelMessages, streamText } from "ai";
 
-import { CHAT_MODEL, SYSTEM_PROMPT, chatModel } from "@/lib/ai";
+import {
+  CHAT_MODEL,
+  SYSTEM_PROMPT,
+  buildGroundedSystemPrompt,
+  chatModel,
+} from "@/lib/ai";
+import { extractLatestSources, type ChatUIMessage } from "@/lib/attachments";
 
 // OpenAI 호출은 서버에서만 일어납니다. 키는 응답에 절대 포함되지 않습니다.
 export const runtime = "nodejs";
@@ -17,9 +23,9 @@ export async function POST(req: Request) {
     );
   }
 
-  let messages: UIMessage[];
+  let messages: ChatUIMessage[];
   try {
-    const body = (await req.json()) as { messages?: UIMessage[] };
+    const body = (await req.json()) as { messages?: ChatUIMessage[] };
     if (!Array.isArray(body.messages)) {
       return Response.json(
         { error: "messages 형식이 올바르지 않습니다." },
@@ -34,15 +40,20 @@ export async function POST(req: Request) {
     );
   }
 
+  // 이번 질문에 붙어 온 자료만 사용합니다. 크기는 서버에서 다시 제한합니다.
+  const sources = extractLatestSources(messages);
+
   const result = streamText({
     model: chatModel(),
-    system: SYSTEM_PROMPT,
+    system:
+      sources.length > 0 ? buildGroundedSystemPrompt(sources) : SYSTEM_PROMPT,
+    // data-* 파트는 convertToModelMessages 기본 동작에서 제외됩니다.
+    // 자료는 위 시스템 프롬프트로만 전달되므로 턴마다 중복되지 않습니다.
     messages: convertToModelMessages(messages),
   });
 
   return result.toUIMessageStreamResponse({
     onError: (error) => {
-      // 서버 로그에만 원문을 남기고, 클라이언트에는 한국어 메시지만 보냅니다.
       console.error(`[api/chat] ${CHAT_MODEL} 호출 실패:`, error);
       return "답변을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.";
     },
