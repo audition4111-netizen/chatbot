@@ -5,8 +5,8 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { AlertTriangle } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessage, ThinkingBubble } from "@/components/chat/chat-message";
 import { EmptyState } from "@/components/chat/empty-state";
@@ -46,57 +46,49 @@ export function ChatPanel() {
         aria-live="polite"
         aria-label="대화 내용"
       >
-        <div className="mx-auto flex w-full max-w-[820px] flex-col gap-xl px-xl py-xxl md:px-xxl">
+        <div className="mx-auto flex w-full max-w-[820px] flex-col gap-xl px-xl pb-xxl md:px-xxl">
           {messages.length === 0 ? (
             <EmptyState onPick={send} />
           ) : (
-            messages.map((message) => (
-              <ChatMessage key={message.id} message={message} />
-            ))
+            <div className="flex flex-col gap-xl pt-xxl">
+              {messages.map((message) => (
+                <ChatMessage key={message.id} message={message} />
+              ))}
+            </div>
           )}
 
           {status === "submitted" && <ThinkingBubble />}
 
           {error && (
-            <div
-              role="alert"
-              className="flex items-start gap-md rounded-xl border border-critical-strong bg-canvas p-xl"
-            >
+            <Card role="alert" className="flex items-start gap-md border-critical-strong">
               <AlertTriangle
                 size={20}
                 className="mt-xxs shrink-0 text-critical-strong"
                 aria-hidden
               />
-              <div className="flex flex-col gap-md">
-                <div className="flex items-center gap-xs">
-                  <Badge variant="critical">오류</Badge>
-                </div>
+              <div className="flex flex-col items-start gap-md">
                 <p className="text-body-sm text-charcoal">
-                  답변을 받지 못했습니다. 네트워크 상태와 서버의 OPENAI_API_KEY
-                  설정을 확인한 뒤 다시 시도해 주세요.
+                  답변을 받지 못했습니다. 잠시 후 다시 시도해 주세요.
                 </p>
-                <div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="ghost"
-                    onClick={() => void regenerate()}
-                  >
-                    다시 시도
-                  </Button>
-                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="ghost"
+                  onClick={() => void regenerate()}
+                >
+                  다시 시도
+                </Button>
               </div>
-            </div>
+            </Card>
           )}
         </div>
       </div>
 
-      {/* 하단 입력 영역: 스티키 패널 (DESIGN.md > Elevation level 2) */}
       <div className="border-t border-hairline-soft bg-canvas">
         <div className="mx-auto w-full max-w-[820px] px-xl py-base md:px-xxl">
           <ChatComposer onSubmit={send} onStop={stop} isBusy={isBusy} />
           <p className="mt-xs text-caption text-stone">
-            AI가 생성한 답변은 부정확할 수 있습니다. 중요한 내용은 직접 확인하세요.
+            AI가 생성한 답변은 부정확할 수 있습니다.
           </p>
         </div>
       </div>

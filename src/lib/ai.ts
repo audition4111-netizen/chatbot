@@ -18,7 +18,7 @@ export const EMBEDDING_MODEL = "text-embedding-3-small" as const;
 export const chatModel = () => openai(CHAT_MODEL);
 export const embeddingModel = () => openai.textEmbeddingModel(EMBEDDING_MODEL);
 
-/** 한국어 챗봇 기본 시스템 프롬프트 */
+/** 기본 시스템 프롬프트 (답변 언어는 한국어 유지) */
 export const SYSTEM_PROMPT = `당신은 한국어로 답하는 친절하고 정확한 어시스턴트입니다.
 
 규칙:

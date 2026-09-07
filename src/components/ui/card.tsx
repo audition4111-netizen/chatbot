@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * DESIGN.md > Cards & Containers
- * card-icon-feature / why-buy-tile 계열:
- * canvas 배경 + rounded.xl(16px) + hairline-soft 1px 보더, 그림자 없음(플랫).
+ * card-icon-feature 계열: canvas 배경 + rounded.xl(16px) + hairline-soft 1px 보더.
+ * DESIGN.md의 "마케팅 카드에는 무거운 그림자를 쓰지 않는다" 규칙에 따라 플랫입니다.
  */
 function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -19,25 +19,4 @@ function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   );
 }
 
-function CardTitle({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3
-      className={cn("text-subtitle-lg font-bold text-ink-deep", className)}
-      {...props}
-    />
-  );
-}
-
-function CardBody({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLParagraphElement>) {
-  return (
-    <p className={cn("text-body-sm text-charcoal", className)} {...props} />
-  );
-}
-
-export { Card, CardTitle, CardBody };
+export { Card };

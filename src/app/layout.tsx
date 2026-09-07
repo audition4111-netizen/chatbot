@@ -23,8 +23,8 @@ const notoSansKr = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "한국어 챗봇",
-  description: "gpt-4.1-mini 기반 한국어 어시스턴트",
+  title: "챗봇",
+  description: "gpt-4.1-mini 기반 챗봇",
 };
 
 export const viewport: Viewport = {

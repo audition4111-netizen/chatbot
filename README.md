@@ -1,6 +1,6 @@
-# 한국어 챗봇
+# 챗봇
 
-Next.js(App Router) + Vercel AI SDK + shadcn/ui 스타일 컴포넌트로 만든 한국어 챗봇입니다.
+Next.js(App Router) + Vercel AI SDK + shadcn/ui 스타일 컴포넌트로 만든 챗봇입니다. 답변은 한국어로 합니다.
 UI의 색상·글꼴·간격·컴포넌트 규칙은 저장소 루트의 `DESIGN.md`를 따릅니다.
 
 - 채팅 모델: `gpt-4.1-mini`
