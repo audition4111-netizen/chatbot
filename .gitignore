@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+build/
+.DS_Store
+*.pem
+
+# 로컬 환경 변수 (비밀 키) — 절대 커밋하지 않습니다
+.env
+.env.local
+.env*.local
+
+.vercel
+*.tsbuildinfo
+next-env.d.ts

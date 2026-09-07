@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* =========================================================================
+   DESIGN.md → Tailwind v4 테마 토큰
+   출처: DESIGN.md (Meta-design-analysis, version: alpha)
+   토큰 이름은 DESIGN.md의 키를 그대로 따릅니다. 값은 하드코딩하지 말고
+   반드시 아래 토큰(예: bg-canvas, text-ink-deep, rounded-pill, p-xl)을 쓰세요.
+   ========================================================================= */
+@theme {
+  /* ---- colors ---- */
+  --color-primary: #0064e0;
+  --color-primary-deep: #0457cb;
+  --color-primary-soft: #0091ff;
+  --color-on-primary: #ffffff;
+  --color-ink-button: #000000;
+  --color-on-ink-button: #ffffff;
+  --color-fb-blue: #1876f2;
+  --color-meta-link: #385898;
+  --color-oculus-purple: #a121ce;
+  --color-success: #31a24c;
+  --color-success-bg: #24e400;
+  --color-attention: #f2a918;
+  --color-warning: #f7b928;
+  --color-warning-bg: #ffe200;
+  --color-critical: #e41e3f;
+  --color-critical-strong: #f0284a;
+  --color-canvas: #ffffff;
+  --color-surface-soft: #f1f4f7;
+  --color-ink-deep: #0a1317;
+  --color-ink: #1c1e21;
+  --color-charcoal: #444950;
+  --color-slate: #4b4c4f;
+  --color-steel: #5d6c7b;
+  --color-stone: #8595a4;
+  --color-hairline: #ced0d4;
+  --color-hairline-soft: #dee3e9;
+  --color-disabled-text: #bcc0c4;
+
+  /* ---- typography ---- */
+  /* Optimistic VF는 Meta 전용 비공개 서체입니다. DESIGN.md가 명시한 폴백
+     체인(Montserrat, Helvetica, Arial, Noto Sans)을 사용하고, 한글은
+     Noto Sans KR로 이어받습니다. next/font 로 주입된 변수를 참조합니다. */
+  --font-sans: var(--font-optimistic-fallback), Montserrat, var(--font-noto-kr),
+    Helvetica, Arial, "Noto Sans", sans-serif;
+
+  --text-hero-display: 64px;
+  --text-hero-display--line-height: 1.16;
+  --text-hero-display--font-weight: 500;
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 1.17;
+  --text-display-lg--font-weight: 500;
+  --text-heading-lg: 36px;
+  --text-heading-lg--line-height: 1.28;
+  --text-heading-lg--font-weight: 500;
+  --text-heading-md: 28px;
+  --text-heading-md--line-height: 1.21;
+  --text-heading-md--font-weight: 300;
+  --text-heading-sm: 24px;
+  --text-heading-sm--line-height: 1.25;
+  --text-heading-sm--font-weight: 500;
+  --text-subtitle-lg: 18px;
+  --text-subtitle-lg--line-height: 1.44;
+  --text-subtitle-lg--font-weight: 700;
+  --text-subtitle-md: 18px;
+  --text-subtitle-md--line-height: 1.44;
+  --text-subtitle-md--font-weight: 400;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.5;
+  --text-body-md--letter-spacing: -0.16px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 1.43;
+  --text-body-sm--letter-spacing: -0.14px;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.33;
+
+  /* ---- rounded ---- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 16px;
+  --radius-xxl: 24px;
+  --radius-xxxl: 32px;
+  --radius-feature: 40px;
+  --radius-pill: 100px; /* DESIGN.md {rounded.full} */
+
+  /* ---- spacing ---- */
+  --spacing-xxs: 4px;
+  --spacing-xs: 8px;
+  --spacing-sm: 10px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --spacing-xxxl: 40px;
+  --spacing-section-sm: 48px;
+  --spacing-section: 64px;
+  --spacing-section-lg: 80px;
+  --spacing-hero: 120px;
+
+  /* ---- elevation (DESIGN.md: 시스템은 기본적으로 플랫) ---- */
+  --shadow-level-1: rgba(0, 0, 0, 0.2) 1px 1px 0px 0px;
+  --shadow-level-2: rgba(20, 22, 26, 0.3) 0px 1px 4px 0px;
+
+  /* ---- motion (DESIGN.md > Known Gaps 권장값) ---- */
+  --animate-surface-in: surface-in 200ms ease-out;
+}
+
+@keyframes surface-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  70% {
+    opacity: 1;
+  }
+  71%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* DESIGN.md에 다크모드 토큰이 정의되어 있지 않으므로 라이트 전용입니다. */
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink-deep);
+  font-family: var(--font-sans);
+  /* DESIGN.md: 모든 heading에서 ss01, ss02를 항상 함께 켭니다. */
+  font-feature-settings: "ss01", "ss02";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 포커스 링: DESIGN.md의 폼 활성 색(fb-blue)을 재사용합니다. */
+:focus-visible {
+  outline: 2px solid var(--color-fb-blue);
+  outline-offset: 2px;
+}
