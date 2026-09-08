@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { RotateCcw, Scissors, Search } from "lucide-react";
+import { ClipboardCheck, RotateCcw, Scissors, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -30,6 +30,13 @@ export function TopNav({ onReset }: { onReset: () => void }) {
             <Link href="/search">
               <Search size={14} strokeWidth={2.5} aria-hidden />
               검색 비교
+            </Link>
+          </Button>
+
+          <Button asChild variant="pillTab" size="pill" className="max-lg:hidden">
+            <Link href="/eval">
+              <ClipboardCheck size={14} strokeWidth={2.5} aria-hidden />
+              검색 평가
             </Link>
           </Button>
 

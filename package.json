@@ -8,7 +8,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "knowledge": "node scripts/build-knowledge.mjs",
-    "prebuild": "node scripts/build-knowledge.mjs"
+    "prebuild": "node scripts/build-knowledge.mjs && node scripts/check-eval-isolation.mjs",
+    "check:eval": "node scripts/check-eval-isolation.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.0",

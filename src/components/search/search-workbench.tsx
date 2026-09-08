@@ -81,6 +81,9 @@ export function SearchWorkbench() {
             <Button asChild variant="pillTab" size="pill">
               <Link href="/chunks">문서 조각 보기</Link>
             </Button>
+            <Button asChild variant="pillTab" size="pill">
+              <Link href="/eval">검색 평가</Link>
+            </Button>
             <Button asChild variant="ghost" size="ghost">
               <Link href="/">
                 <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
