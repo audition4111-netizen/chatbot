@@ -3,11 +3,21 @@ import { tokenize } from "@/lib/tokenize";
 /**
  * BM25 키워드 검색.
  * k1은 용어 빈도의 포화 정도, b는 문서 길이 정규화 강도입니다.
+ *
+ * 색인은 검색 대상 집합으로만 만듭니다. 필터로 문서를 좁히면 IDF도
+ * 좁혀진 집합 기준으로 계산되어야 하기 때문입니다. 토큰화는 비용이 있어
+ * 미리 잘라둔 토큰 배열을 받습니다.
  */
 const K1 = 1.2;
 const B = 0.75;
 
+export type Bm25Document = { id: string; tokens: string[] };
 export type Bm25Hit = { id: string; score: number };
+
+/** 문서를 색인 가능한 형태로 미리 토큰화해 둡니다. */
+export function toBm25Document(id: string, text: string): Bm25Document {
+  return { id, tokens: tokenize(text) };
+}
 
 export class Bm25Index {
   /** term -> (docId -> 빈도) */
@@ -16,15 +26,14 @@ export class Bm25Index {
   private averageLength = 0;
   private docCount = 0;
 
-  constructor(documents: Array<{ id: string; text: string }>) {
+  constructor(documents: Bm25Document[]) {
     let totalLength = 0;
 
     for (const document of documents) {
-      const tokens = tokenize(document.text);
-      this.docLengths.set(document.id, tokens.length);
-      totalLength += tokens.length;
+      this.docLengths.set(document.id, document.tokens.length);
+      totalLength += document.tokens.length;
 
-      for (const token of tokens) {
+      for (const token of document.tokens) {
         let posting = this.postings.get(token);
         if (!posting) {
           posting = new Map();
@@ -60,8 +69,7 @@ export class Bm25Index {
         const normalization =
           this.averageLength > 0 ? length / this.averageLength : 1;
         const denominator = frequency + K1 * (1 - B + B * normalization);
-        const contribution = idf * ((frequency * (K1 + 1)) / denominator);
-        scores.set(docId, (scores.get(docId) ?? 0) + contribution);
+        scores.set(docId, (scores.get(docId) ?? 0) + idf * ((frequency * (K1 + 1)) / denominator));
       }
     }
 

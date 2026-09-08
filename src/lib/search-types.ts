@@ -31,8 +31,52 @@ export type SearchResponse = {
   query: string;
   queryTokens: string[];
   chunkCount: number;
+  scope: SearchScope;
   keyword: SearchHit[];
   vector: SearchHit[];
   hybrid: SearchHit[];
   timings: { keyword: number; vector: number; hybrid: number };
+};
+
+/** 적용 기간 필터 방식 */
+export type PeriodMode = "all" | "current" | "date";
+
+export type SearchFilters = {
+  /** 검색할 파일명 목록. 비어 있으면 "전체"로 봅니다. */
+  fileNames: string[];
+  periodMode: PeriodMode;
+  /** periodMode === "date" 일 때의 기준일 (YYYY-MM-DD) */
+  asOf: string | null;
+};
+
+export const DEFAULT_FILTERS: SearchFilters = {
+  fileNames: [],
+  periodMode: "all",
+  asOf: null,
+};
+
+/** 문서 하나가 이번 검색에 포함됐는지와 그 이유 */
+export type ScopeDocument = {
+  fileName: string;
+  title: string;
+  version: string | null;
+  period: string | null;
+  status: string | null;
+  included: boolean;
+  /** 제외된 이유. 포함된 경우 null */
+  excludedReason: string | null;
+  /** 이 문서에서 검색 대상이 된 조각 수 */
+  chunkCount: number;
+};
+
+/** 실제로 검색이 이뤄진 범위. 요청한 필터가 아니라 적용된 결과입니다. */
+export type SearchScope = {
+  documents: ScopeDocument[];
+  includedDocuments: number;
+  totalDocuments: number;
+  chunkCount: number;
+  totalChunkCount: number;
+  periodMode: PeriodMode;
+  /** periodMode 가 current/date 일 때 실제로 사용된 기준일 */
+  asOf: string | null;
 };

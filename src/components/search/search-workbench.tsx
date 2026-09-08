@@ -5,9 +5,16 @@ import Link from "next/link";
 import { ArrowLeft, Search } from "lucide-react";
 
 import { ResultColumn } from "@/components/search/result-column";
+import { ScopeSummary } from "@/components/search/scope-summary";
+import { SearchFiltersPanel } from "@/components/search/search-filters";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MAX_TOP_K, type SearchResponse } from "@/lib/search-types";
+import {
+  DEFAULT_FILTERS,
+  MAX_TOP_K,
+  type SearchFilters,
+  type SearchResponse,
+} from "@/lib/search-types";
 
 const EXAMPLES = [
   "APP-017",
@@ -19,13 +26,14 @@ const EXAMPLES = [
 export function SearchWorkbench() {
   const [query, setQuery] = React.useState("");
   const [topK, setTopK] = React.useState(5);
+  const [filters, setFilters] = React.useState<SearchFilters>(DEFAULT_FILTERS);
   const [result, setResult] = React.useState<SearchResponse | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const requestId = React.useRef(0);
 
   const run = React.useCallback(
-    async (text: string, k: number) => {
+    async (text: string, k: number, activeFilters: SearchFilters) => {
       const trimmed = text.trim();
       if (trimmed.length === 0) return;
 
@@ -37,7 +45,7 @@ export function SearchWorkbench() {
         const response = await fetch("/api/search", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query: trimmed, topK: k }),
+          body: JSON.stringify({ query: trimmed, topK: k, filters: activeFilters }),
         });
         const data = (await response.json()) as SearchResponse & { error?: string };
         // 늦게 도착한 이전 요청이 최신 결과를 덮어쓰지 않게 합니다.
@@ -57,7 +65,7 @@ export function SearchWorkbench() {
     if (event.key !== "Enter" || event.shiftKey) return;
     if (event.nativeEvent.isComposing) return;
     event.preventDefault();
-    void run(query, topK);
+    void run(query, topK, filters);
   }
 
   const terms = result?.queryTokens ?? [];
@@ -87,7 +95,7 @@ export function SearchWorkbench() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void run(query, topK);
+            void run(query, topK, filters);
           }}
           className="flex flex-col gap-md"
         >
@@ -119,7 +127,7 @@ export function SearchWorkbench() {
                 size="pill"
                 onClick={() => {
                   setQuery(example);
-                  void run(example, topK);
+                  void run(example, topK, filters);
                 }}
               >
                 {example}
@@ -146,12 +154,21 @@ export function SearchWorkbench() {
               onChange={(event) => {
                 const next = Number(event.target.value);
                 setTopK(next);
-                if (result) void run(result.query, next);
+                if (result) void run(result.query, next, filters);
               }}
               className="h-[4px] w-full cursor-pointer appearance-none rounded-pill bg-hairline accent-fb-blue"
             />
           </div>
         </form>
+
+        <SearchFiltersPanel
+          filters={filters}
+          onChange={(next) => {
+            setFilters(next);
+            // 필터를 바꾸면 같은 질의로 즉시 다시 검색해 범위 변화를 바로 봅니다.
+            if (result) void run(result.query, topK, next);
+          }}
+        />
 
         {error && (
           <p role="alert" className="text-body-sm text-critical-strong">
@@ -187,7 +204,14 @@ export function SearchWorkbench() {
         )}
 
         {(result || isLoading) && (
-          <div className="grid gap-xl lg:grid-cols-3">
+          <div className="grid gap-xl xl:grid-cols-[260px_minmax(0,1fr)]">
+            {result && (
+              <div className="xl:sticky xl:top-[88px] xl:self-start">
+                <ScopeSummary scope={result.scope} />
+              </div>
+            )}
+
+            <div className="grid gap-xl lg:grid-cols-3">
             <ResultColumn
               title="키워드 (BM25)"
               subtitle="글자가 그대로 겹치는 조각. 오류 코드에 강합니다"
@@ -215,6 +239,7 @@ export function SearchWorkbench() {
               terms={terms}
               isLoading={isLoading}
             />
+            </div>
           </div>
         )}
 
