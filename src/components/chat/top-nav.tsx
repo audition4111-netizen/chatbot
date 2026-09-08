@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { RotateCcw, Scissors } from "lucide-react";
+import { RotateCcw, Scissors, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -19,10 +19,17 @@ export function TopNav({ onReset }: { onReset: () => void }) {
         </span>
 
         <div className="flex items-center gap-xs">
-          <Button asChild variant="pillTab" size="pill">
+          <Button asChild variant="pillTab" size="pill" className="max-sm:hidden">
             <Link href="/chunks">
               <Scissors size={14} strokeWidth={2.5} aria-hidden />
               문서 조각 보기
+            </Link>
+          </Button>
+
+          <Button asChild variant="pillTab" size="pill" className="max-sm:hidden">
+            <Link href="/search">
+              <Search size={14} strokeWidth={2.5} aria-hidden />
+              검색 비교
             </Link>
           </Button>
 

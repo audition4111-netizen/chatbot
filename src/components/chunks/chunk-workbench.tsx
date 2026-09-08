@@ -98,12 +98,17 @@ export function ChunkWorkbench() {
           <span className="text-subtitle-lg font-bold tracking-[-0.16px] text-ink-deep">
             문서 조각 보기
           </span>
-          <Button asChild variant="ghost" size="ghost">
-            <Link href="/">
-              <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
-              챗봇으로
-            </Link>
-          </Button>
+          <div className="flex items-center gap-xs">
+            <Button asChild variant="pillTab" size="pill">
+              <Link href="/search">검색 비교</Link>
+            </Button>
+            <Button asChild variant="ghost" size="ghost">
+              <Link href="/">
+                <ArrowLeft size={16} strokeWidth={2.5} aria-hidden />
+                챗봇으로
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
 
