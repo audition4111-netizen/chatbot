@@ -113,3 +113,58 @@ export function extractLatestSources(messages: ChatUIMessage[]): SourceFile[] {
   }
   return [];
 }
+
+export type FileIntakeResult = {
+  accepted: Attachment[];
+  errors: string[];
+};
+
+/**
+ * 파일 목록을 검사하고 텍스트로 읽어들입니다.
+ * 입력창(첨부)과 문서 조각 보기 화면이 같은 규칙을 쓰도록 여기에 모아둡니다.
+ */
+export async function readAttachments(
+  fileList: FileList | File[] | null,
+  existingCount: number,
+): Promise<FileIntakeResult> {
+  const accepted: Attachment[] = [];
+  const errors: string[] = [];
+  if (!fileList) return { accepted, errors };
+
+  let slots = MAX_FILES - existingCount;
+
+  for (const file of Array.from(fileList)) {
+    if (!hasAcceptedExtension(file.name)) {
+      errors.push(`${file.name}: TXT·MD 파일만 사용할 수 있습니다`);
+      continue;
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      errors.push(
+        `${file.name}: 파일이 너무 큽니다 (${formatBytes(file.size)} / 최대 ${formatBytes(MAX_FILE_BYTES)})`,
+      );
+      continue;
+    }
+    if (slots <= 0) {
+      errors.push(`${file.name}: 최대 ${MAX_FILES}개까지 사용할 수 있습니다`);
+      continue;
+    }
+    try {
+      const text = await file.text();
+      if (text.trim().length === 0) {
+        errors.push(`${file.name}: 내용이 비어 있습니다`);
+        continue;
+      }
+      accepted.push({
+        id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
+        name: file.name,
+        bytes: file.size,
+        text,
+      });
+      slots -= 1;
+    } catch {
+      errors.push(`${file.name}: 파일을 읽지 못했습니다`);
+    }
+  }
+
+  return { accepted, errors };
+}

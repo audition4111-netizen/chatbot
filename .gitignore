@@ -13,3 +13,6 @@ build/
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# 실습 원본 폴더 (knowledge/ 로 복사해 사용)
+0907~0908/

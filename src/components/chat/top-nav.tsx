@@ -1,6 +1,7 @@
 "use client";
 
-import { RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { RotateCcw, Scissors } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -17,16 +18,25 @@ export function TopNav({ onReset }: { onReset: () => void }) {
           챗봇
         </span>
 
-        <Button
-          variant="iconCircular"
-          size="icon"
-          type="button"
-          onClick={onReset}
-          aria-label="대화 새로 시작"
-          title="대화 새로 시작"
-        >
-          <RotateCcw size={20} strokeWidth={2} aria-hidden />
-        </Button>
+        <div className="flex items-center gap-xs">
+          <Button asChild variant="pillTab" size="pill">
+            <Link href="/chunks">
+              <Scissors size={14} strokeWidth={2.5} aria-hidden />
+              문서 조각 보기
+            </Link>
+          </Button>
+
+          <Button
+            variant="iconCircular"
+            size="icon"
+            type="button"
+            onClick={onReset}
+            aria-label="대화 새로 시작"
+            title="대화 새로 시작"
+          >
+            <RotateCcw size={20} strokeWidth={2} aria-hidden />
+          </Button>
+        </div>
       </div>
     </header>
   );
