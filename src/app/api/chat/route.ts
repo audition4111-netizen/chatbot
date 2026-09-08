@@ -1,11 +1,6 @@
 import { convertToModelMessages, streamText } from "ai";
 
-import {
-  CHAT_MODEL,
-  SYSTEM_PROMPT,
-  buildGroundedSystemPrompt,
-  chatModel,
-} from "@/lib/ai";
+import { CHAT_MODEL, buildSystemPrompt, chatModel } from "@/lib/ai";
 import { extractLatestSources, type ChatUIMessage } from "@/lib/attachments";
 
 // OpenAI 호출은 서버에서만 일어납니다. 키는 응답에 절대 포함되지 않습니다.
@@ -40,13 +35,13 @@ export async function POST(req: Request) {
     );
   }
 
-  // 이번 질문에 붙어 온 자료만 사용합니다. 크기는 서버에서 다시 제한합니다.
+  // 기본 자료(knowledge/*.md)는 항상 포함하고, 이번 질문에 붙어 온 첨부만
+  // 추가로 사용합니다. 첨부 크기는 서버에서 다시 제한합니다.
   const sources = extractLatestSources(messages);
 
   const result = streamText({
     model: chatModel(),
-    system:
-      sources.length > 0 ? buildGroundedSystemPrompt(sources) : SYSTEM_PROMPT,
+    system: buildSystemPrompt(sources),
     // data-* 파트는 convertToModelMessages 기본 동작에서 제외됩니다.
     // 자료는 위 시스템 프롬프트로만 전달되므로 턴마다 중복되지 않습니다.
     messages: convertToModelMessages(messages),
